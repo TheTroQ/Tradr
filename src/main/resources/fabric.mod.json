@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "tradr",
+  "version": "${version}",
+  "name": "Tradr",
+  "description": "",
+  "authors": ["Dratii(TheTroQ)"],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tradr/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "me.dratii.tradr.Tradr"
+    ],
+    "client": [
+      "me.dratii.tradr.TradrClient"
+    ]
+  },
+  "mixins": [
+    "tradr.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "fabric-api-base": "*",
+    "fabric-lifecycle-events-v1": "*",
+    "fabric-key-binding-api-v1": "*"
+  }
+}
