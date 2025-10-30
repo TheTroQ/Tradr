@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -38,8 +39,9 @@ public class Tradr implements ModInitializer {
             while (keyBinding.wasPressed()) {
                 enabled = !enabled;
                 if (enabled) {
+                    MinecraftClient.getInstance().player.sendMessage(Text.of("Enabled"),true);
                 } else{
-
+                    MinecraftClient.getInstance().player.sendMessage(Text.of("Disabled"),true);
                 }
             }
 
