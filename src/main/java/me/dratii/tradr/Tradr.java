@@ -5,8 +5,6 @@ package me.dratii.tradr;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -15,6 +13,7 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.glfw.GLFW;
 
@@ -23,35 +22,30 @@ import static me.dratii.tradr.Globals.*;
 public class Tradr implements ModInitializer {
 
     private static KeyBinding keyBinding;
+    private static final KeyBinding.Category TRADR_CATEGORY = KeyBinding.Category.create(Identifier.of("tradr", "main"));
 
     @Override
     public void onInitialize()
     {
-        var mm = MiniMessage.miniMessage();
 
         keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "TradrKEY", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_LEFT_ALT, // The keycode of the key
-                "Tradr" // The translation key of the keybinding's category.
+                TRADR_CATEGORY // The translation key of the keybinding's category.
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                player = MinecraftClient.getInstance().player;
-                Component parsed;
                 enabled = !enabled;
                 if (enabled) {
-                    parsed = mm.deserialize("AutoTrader: <Green> Enabled");
+                } else{
 
-
-                } else parsed = mm.deserialize("AutoTrader: <red>Disabled");
-                assert player != null;
-                player.sendActionBar(parsed);
+                }
             }
 
             //kurwa czarna magia
             if (client.currentScreen instanceof BetterMerchant betterMerchant && enabled) {
-                betterMerchant.cos();
+                betterMerchant.autotrade();
                 client.currentScreen.close();
                 openVillager = false;
             }
@@ -71,10 +65,10 @@ public class Tradr implements ModInitializer {
         assert mc.world != null;
         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof VillagerEntity villagerEntity && !tradedVillagers.contains(villagerEntity)) {
-                Vec3d entityPos = entity.getPos();
+                Vec3d entityPos = entity.getEntityPos();
                 availableVillagers.add(villagerEntity);
                 assert mc.player != null;
-                if (entityPos.distanceTo(mc.player.getPos()) <= 3 && availableVillagers.contains(villagerEntity)) {
+                if (entityPos.distanceTo(mc.player.getEntityPos()) <= 3 && availableVillagers.contains(villagerEntity)) {
                     mc.player.swingHand(Hand.MAIN_HAND, true);
                     mc.player.networkHandler
                             .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));

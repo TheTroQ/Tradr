@@ -14,7 +14,6 @@
       "me.dratii.tradr.Tradr"
     ],
     "client": [
-      "me.dratii.tradr.TradrClient"
     ]
   },
   "mixins": [

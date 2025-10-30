@@ -191,7 +191,7 @@ public class BetterMerchant extends MerchantScreen implements AutoTrade {
         this.onMouseClick(null, slot, 0, SlotActionType.PICKUP);
     }
 
-    public void cos() {
+    public void autotrade() {
             var recipes = this.handler.getRecipes();
             for (int i = 0; i < recipes.size(); i++) {
                 var trade = recipes.get(i);

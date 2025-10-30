@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.12-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -28,8 +28,8 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation "net.kyori:adventure-text-minimessage:4.24.0-SNAPSHOT"
-    modImplementation include("net.kyori:adventure-platform-fabric:6.5.0-SNAPSHOT")
+    //implementation "net.kyori:adventure-text-minimessage:4.24.0-SNAPSHOT"
+    //modImplementation include("net.kyori:adventure-platform-fabric:6.5.0-SNAPSHOT")
    //modImplementation "baritone-api-fabric:baritone-api-fabric:1.14.0-1"
    //modImplementation "nether-pathfinder:nether-pathfinder:57"
 }
