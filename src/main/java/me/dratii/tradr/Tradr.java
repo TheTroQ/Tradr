@@ -2,6 +2,8 @@ package me.dratii.tradr;
 
 //import baritone.api.BaritoneAPI;
 
+import eu.midnightdust.lib.config.MidnightConfig;
+import me.dratii.tradr.modmenu.ConfigScreen;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -28,7 +30,7 @@ public class Tradr implements ModInitializer {
     @Override
     public void onInitialize()
     {
-
+        MidnightConfig.init("tradr", ConfigScreen.class);
         keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "TradrKEY", // The translation key of the keybinding's name
                 InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.

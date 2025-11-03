@@ -1,9 +1,11 @@
 package me.dratii.tradr;
 
+import me.dratii.tradr.modmenu.ConfigScreen;
 import net.minecraft.client.gui.screen.ingame.MerchantScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.MerchantScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
@@ -195,7 +197,7 @@ public class BetterMerchant extends MerchantScreen implements AutoTrade {
             var recipes = this.handler.getRecipes();
             for (int i = 0; i < recipes.size(); i++) {
                 var trade = recipes.get(i);
-                if (trade.getSellItem().getItem() == Items.EMERALD) {
+                if (trade.getSellItem().getItem() ==  Registries.ITEM.get(ConfigScreen.TradeFor)) {
                     trade(i);
                 }
             }

@@ -14,6 +14,9 @@
       "me.dratii.tradr.Tradr"
     ],
     "client": [
+    ],
+    "modmenu": [
+      "me.dratii.tradr.modmenu.config"
     ]
   },
   "mixins": [
@@ -26,5 +29,10 @@
     "fabric-api-base": "*",
     "fabric-lifecycle-events-v1": "*",
     "fabric-key-binding-api-v1": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "update_checker": false
+    }
   }
 }
