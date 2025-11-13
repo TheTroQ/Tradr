@@ -66,21 +66,21 @@ public class Tradr implements ModInitializer {
 
     public void tradeNearbyVillager() {
         MinecraftClient mc = MinecraftClient.getInstance();
-        assert mc.world != null;
-        for (Entity entity : mc.world.getEntities()) {
+        if(mc.world != null)
+         for (Entity entity : mc.world.getEntities()) {
             if (entity instanceof VillagerEntity villagerEntity && !tradedVillagers.contains(villagerEntity)) {
                 Vec3d entityPos = entity.getEntityPos();
                 availableVillagers.add(villagerEntity);
-                assert mc.player != null;
-                if (entityPos.distanceTo(mc.player.getEntityPos()) <= 3 && availableVillagers.contains(villagerEntity)) {
-                    mc.player.swingHand(Hand.MAIN_HAND, true);
-                    mc.player.networkHandler
+                if(mc.player != null)
+                    if (entityPos.distanceTo(mc.player.getEntityPos()) <= 3 && availableVillagers.contains(villagerEntity)) {
+                        mc.player.swingHand(Hand.MAIN_HAND, true);
+                        mc.player.networkHandler
                             .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                    mc.player.networkHandler
+                        mc.player.networkHandler
                             .sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
-                    tradedVillagers.add(villagerEntity);
-                    openVillager = true;
-                    return;
+                        tradedVillagers.add(villagerEntity);
+                        openVillager = true;
+                        return;
                 }
             }
         }
