@@ -14,10 +14,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.village.VillagerProfession;
 import org.lwjgl.glfw.GLFW;
 
 import static me.dratii.tradr.Globals.*;
@@ -68,7 +70,7 @@ public class Tradr implements ModInitializer {
         MinecraftClient mc = MinecraftClient.getInstance();
         if(mc.world != null)
          for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof VillagerEntity villagerEntity && !tradedVillagers.contains(villagerEntity)) {
+            if (entity instanceof VillagerEntity villagerEntity && !tradedVillagers.contains(villagerEntity) && (villagerEntity.getVillagerData().profession() != RegistryEntry.of(VillagerProfession.NITWIT).getKeyOrValue()) && (villagerEntity.getVillagerData().profession() != RegistryEntry.of(VillagerProfession.NONE).getKeyOrValue())) {
                 Vec3d entityPos = entity.getEntityPos();
                 availableVillagers.add(villagerEntity);
                 if(mc.player != null)
