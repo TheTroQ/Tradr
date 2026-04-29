@@ -22,13 +22,14 @@
   "mixins": [
     "tradr.mixins.json"
   ],
+  "accessWidener": "tradr.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": "${minecraft_version}",
     "fabric-api-base": "*",
     "fabric-lifecycle-events-v1": "*",
-    "fabric-key-binding-api-v1": "*",
+    "fabric-key-mapping-api-v1": "*",
     "modmenu": "*",
     "midnightlib": "*"
   },

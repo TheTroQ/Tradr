@@ -1,28 +1,28 @@
 package me.dratii.tradr.mixin;
 
 import me.dratii.tradr.BetterMerchant;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.screen.MerchantScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(HandledScreens.class)
+@Mixin(MenuScreens.class)
 public abstract class GuiMerchantMixin {
 
-    @Inject(method = "open", at = @At("HEAD"), cancellable = true)
-    private static void displayVillagerTradeGui(ScreenHandlerType type, MinecraftClient client,
-                                                int any, Text component, CallbackInfo ci) {
+    @Inject(method = "create", at = @At("HEAD"), cancellable = true)
+    private static void displayVillagerTradeGui(MenuType type, Minecraft minecraft,
+                                                int containerId, Component title, CallbackInfo ci) {
 
-        if (type == ScreenHandlerType.MERCHANT) {
-            MerchantScreenHandler container = ScreenHandlerType.MERCHANT.create(any, client.player.getInventory());
-            BetterMerchant screen = new BetterMerchant(container, client.player.getInventory(), component);
-            client.player.currentScreenHandler = container;
-            client.setScreen(screen);
+        if (type == MenuType.MERCHANT) {
+            MerchantMenu container = MenuType.MERCHANT.create(containerId, minecraft.player.getInventory());
+            BetterMerchant screen = new BetterMerchant(container, minecraft.player.getInventory(), title);
+            minecraft.player.containerMenu = container;
+            minecraft.setScreen(screen);
             ci.cancel();
         }
     }

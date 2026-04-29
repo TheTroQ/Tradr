@@ -6,56 +6,60 @@ import eu.midnightdust.lib.config.MidnightConfig;
 import me.dratii.tradr.modmenu.ConfigScreen;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.village.VillagerProfession;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Interaction;
+import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static me.dratii.tradr.Globals.*;
 
 public class Tradr implements ModInitializer {
-
-    private static KeyBinding keyBinding;
-    private static final KeyBinding.Category TRADR_CATEGORY = KeyBinding.Category.create(Identifier.of("tradr", "main"));
+    public static final String MOD_ID = "Tradr";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    private static KeyMapping keyBinding;
+    private static final KeyMapping.Category TRADR_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("tradr", "main"));
 
     @Override
     public void onInitialize()
     {
         MidnightConfig.init("tradr", ConfigScreen.class);
-        keyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        keyBinding = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "TradrKEY", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
+                InputConstants.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
                 GLFW.GLFW_KEY_LEFT_ALT, // The keycode of the key
                 TRADR_CATEGORY // The translation key of the keybinding's category.
         ));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyBinding.wasPressed()) {
+            while (keyBinding.consumeClick()) {
                 enabled = !enabled;
                 if (enabled) {
-                    MinecraftClient.getInstance().player.sendMessage(Text.of("Enabled"),true);
+                    Minecraft.getInstance().player.sendOverlayMessage(Component.literal("Enabled"));
                 } else{
-                    MinecraftClient.getInstance().player.sendMessage(Text.of("Disabled"),true);
+                    Minecraft.getInstance().player.sendOverlayMessage(Component.literal("Disabled"));
                 }
             }
 
             //kurwa czarna magia
-            if (client.currentScreen instanceof BetterMerchant betterMerchant && enabled) {
+            if (client.screen instanceof BetterMerchant betterMerchant && enabled) {
                 betterMerchant.autotrade();
-                client.currentScreen.close();
+                client.screen.onClose();
                 openVillager = false;
             }
-            if (enabled && !(client.currentScreen instanceof BetterMerchant) && !openVillager) {
+            if (enabled && !(client.screen instanceof BetterMerchant) && !openVillager) {
                 tradeNearbyVillager();
             }
             if (!enabled) {
@@ -67,19 +71,19 @@ public class Tradr implements ModInitializer {
 
 
     public void tradeNearbyVillager() {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if(mc.world != null)
-         for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof VillagerEntity villagerEntity && !tradedVillagers.contains(villagerEntity) && (villagerEntity.getVillagerData().profession() != RegistryEntry.of(VillagerProfession.NITWIT).getKeyOrValue()) && (villagerEntity.getVillagerData().profession() != RegistryEntry.of(VillagerProfession.NONE).getKeyOrValue())) {
-                Vec3d entityPos = entity.getEntityPos();
+        Minecraft mc = Minecraft.getInstance();
+        if(mc.level != null)
+         for (Entity entity : mc.level.getEntities().getAll()) {
+            if (entity instanceof Villager villagerEntity && !tradedVillagers.contains(villagerEntity) && (villagerEntity.getVillagerData().profession() != Holder.direct(VillagerProfession.NITWIT).value()) && (villagerEntity.getVillagerData().profession() != Holder.direct(VillagerProfession.NONE).value())) {
+                Vec3 entityPos = entity.position();
                 availableVillagers.add(villagerEntity);
                 if(mc.player != null)
-                    if (entityPos.distanceTo(mc.player.getEntityPos()) <= 3 && availableVillagers.contains(villagerEntity)) {
-                        mc.player.swingHand(Hand.MAIN_HAND, true);
-                        mc.player.networkHandler
-                            .sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-                        mc.player.networkHandler
-                            .sendPacket(PlayerInteractEntityC2SPacket.interact(entity, false, Hand.MAIN_HAND));
+                    if (entityPos.distanceTo(mc.player.position()) <= 3 && availableVillagers.contains(villagerEntity)) {
+                        mc.player.swing(InteractionHand.MAIN_HAND, true);
+                        mc.player.connection
+                            .send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                        mc.player.connection
+                            .send(new ServerboundInteractPacket(entity.getId(),InteractionHand.MAIN_HAND,entity.getEyePosition(),false));
                         tradedVillagers.add(villagerEntity);
                         openVillager = true;
                         return;
